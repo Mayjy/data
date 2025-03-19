@@ -1,0 +1,3 @@
+Average Point Cloud Range: min [-17.49698833 -10.88323196   8.92233143], max [16.8981098   8.54396091 57.32110989]
+Overall Minimum Bound: [-24.915119  -14.114464    3.7818949]
+Overall Maximum Bound: [24.283251 11.440372 67.625481]
