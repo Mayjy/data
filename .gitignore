@@ -1,4 +1,4 @@
-/dataset
+/colorize_image/data
 /kitti
-/processed
-/rawdata
+/predict_image/data
+/process_data/data
