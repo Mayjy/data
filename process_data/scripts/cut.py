@@ -18,13 +18,17 @@ def parse_pcd_header(lines):
     return header, data_start
 
 def remove_outliers_by_percentile(points, lower_percentile=1, upper_percentile=99):
-    cleaned_points = points.copy()
-    for i in [0, 2]:  # 只处理 X (0) 和 Z (2)，跳过 Y (1)
-        low = np.percentile(cleaned_points[:, i], lower_percentile)
-        high = np.percentile(cleaned_points[:, i], upper_percentile)
-        mask = (cleaned_points[:, i] >= low) & (cleaned_points[:, i] <= high)
-        cleaned_points = cleaned_points[mask]
-    return cleaned_points
+    # 分离标签为1的点，保留它们，不参与裁剪
+    mask_label1 = (points[:, 3] == 1)
+    preserved_label1 = points[mask_label1]
+    to_clean = points[~mask_label1]
+
+    for i in [0, 2]:  # 只处理 X 和 Z
+        low = np.percentile(to_clean[:, i], lower_percentile)
+        high = np.percentile(to_clean[:, i], upper_percentile)
+        to_clean = to_clean[(to_clean[:, i] >= low) & (to_clean[:, i] <= high)]
+
+    return np.vstack([to_clean, preserved_label1])
 
 def get_dynamic_bounds(points):
     min_bound = np.min(points[:, :3], axis=0)
@@ -34,16 +38,15 @@ def get_dynamic_bounds(points):
     new_min = min_bound.copy()
     new_max = max_bound.copy()
 
-    # 第一个坐标（X轴）保留中间 70%（两边各裁剪 15%）
+    # X轴保留中间 70%
     new_min[0] = min(-14, min_bound[0] + range_[0] * 0.15)
     new_max[0] = max(14, max_bound[0] - range_[0] * 0.15)
 
-    # 第二个坐标（Y轴）保持不变
+    # Y轴不变
 
-    # 第三个坐标（Z轴）下边界取 max(原始 min_z, 30.0)
+    # Z轴下边界处理
     if range_[2] > 30:
-        new_min[2] = max(min_bound[2]+range_[2]*0.3, 30.0)
-    # new_max[2] 保持不变
+        new_min[2] = max(min_bound[2] + range_[2] * 0.3, 30.0)
 
     return new_min, new_max
 
@@ -53,35 +56,42 @@ def process_file(input_file, output_file):
 
     header, data_start = parse_pcd_header(lines)
     point_lines = lines[data_start:]
-    points = np.loadtxt(point_lines, dtype=np.float32)
 
-    # 先去除离群点
+    try:
+        points = np.loadtxt(point_lines, dtype=np.float32)
+    except Exception as e:
+        print(f"⚠️ 读取失败：{input_file}")
+        print(f"错误信息：{e}")
+        return
+
+    # 去除离群点（标签1不参与）
     points = remove_outliers_by_percentile(points, 1, 99)
 
-    # 分离坐标和标签
     coords = points[:, :3]
     labels = points[:, 3].astype(int)
 
-    # 计算动态边界
+    # 动态边界计算
     new_min, new_max = get_dynamic_bounds(points)
 
-    # 标签为0的点根据范围筛选
+    # 三类处理逻辑
+    mask_label1 = (labels == 1)  # 始终保留
     mask_label0 = (labels == 0)
+    mask_label2 = (labels == 2)
+
     mask_in_bound = np.all((coords >= new_min) & (coords <= new_max), axis=1)
+
+    # 标签0和2的点只保留在范围内的
     mask_keep_label0 = mask_label0 & mask_in_bound
+    mask_keep_label2 = mask_label2 & mask_in_bound
 
-    # 标签为1或2的点全部保留
-    mask_keep_label12 = (labels == 1) | (labels == 2)
-
-    # 合并保留的点
-    mask_keep = mask_keep_label0 | mask_keep_label12
+    mask_keep = mask_label1 | mask_keep_label0 | mask_keep_label2
     filtered_points = points[mask_keep]
 
-    # 统计点数少于 5000 的文件，存文件名和点数
+    # 点数统计
     if filtered_points.shape[0] < 5000:
         too_few_points_files.append((os.path.basename(input_file), filtered_points.shape[0]))
 
-    # 修改 header 中 POINTS 和 WIDTH
+    # 修改 header
     new_header = []
     for line in header:
         if line.startswith("POINTS"):
@@ -99,6 +109,7 @@ def process_file(input_file, output_file):
 
     print(f"✅ 已处理：{input_file}")
     print(f"   点数从 {points.shape[0]} -> {filtered_points.shape[0]}")
+    print(f"   标签统计：", dict(zip(*np.unique(filtered_points[:, 3], return_counts=True))))
 
 def main():
     for filename in os.listdir(input_dir):
