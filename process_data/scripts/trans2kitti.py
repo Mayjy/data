@@ -90,10 +90,10 @@ def organize_data(input_bin_dir, input_label_dir, output_dir):
                 )
 
 if __name__ == '__main__':
-    input_pcd_dir = '1011'  # 替换为您的 PCD 文件夹路径
-    output_bin_dir = '/home/may/data/kitti/dataset/sequences/00/velodyne'  # 替换为输出的 .bin 文件夹路径
-    output_label_dir = 'kitti/dataset/sequences/00/labels'  # 替换为输出的 .label 文件夹路径
-    output_dir = '/home/may/data/kitti/dataset/sequences/00'  # 替换为 SemanticKITTI 数据集根目录路径
+    input_pcd_dir = '/home/may/data/process_data/data/afterDBSCAN_dataset'  # 替换为您的 PCD 文件夹路径
+    output_bin_dir = '/home/may/data/process_data/data/Final_dataset/dataset/sequences/00/velodyne'  # 替换为输出的 .bin 文件夹路径
+    output_label_dir = '/home/may/data/process_data/data/Final_dataset/dataset/sequences/00/labels'  # 替换为输出的 .label 文件夹路径
+    output_dir = '/home/may/data/process_data/data/Final_dataset/dataset/sequences/00'  # 替换为 SemanticKITTI 数据集根目录路径
 
     # 步骤 1：转换 PCD 文件为 .bin 和 .label 文件
     convert_to_bin_and_label(input_pcd_dir, output_bin_dir, output_label_dir)

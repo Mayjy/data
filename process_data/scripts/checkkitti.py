@@ -2,8 +2,8 @@ import os
 import numpy as np
 
 # 目录路径
-velodyne_dir = "/home/may/data/kitti/dataset/sequences/00/velodyne"
-labels_dir = "/home/may/data/kitti/dataset/sequences/00/labels"
+velodyne_dir = "/home/may/data/kitti/dataset/sequences/02/velodyne"
+labels_dir = "/home/may/data/kitti/dataset/sequences/02/labels"
 
 # 加载点云文件
 def load_velodyne_file(filepath):
