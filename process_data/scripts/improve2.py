@@ -74,9 +74,11 @@ def filter_label2_by_normal_cluster(points, normal_knn=20, cos_threshold=0.8, db
     num_label2_after = np.sum(points[:, 3] == 2)
     return points, cluster_info, num_label2_before, num_label2_after
 
+# ...existing code...
+
 if __name__ == "__main__":
-    input_dir = "/home/may/data/predict_image/data/predictresult/exp5"
-    output_dir = "/home/may/data/improve_perfomance/data/exp_5_improved"
+    input_dir = "/home/may/data/process_data/data/afterDBSCAN_dataset"
+    output_dir = "/home/may/data/process_data/data/afterimproved_dataset"
     os.makedirs(output_dir, exist_ok=True)
     for fname in os.listdir(input_dir):
         if not fname.endswith('.pcd'):
@@ -88,4 +90,8 @@ if __name__ == "__main__":
             points, cos_threshold=0.8, dbscan_eps=0.5, dbscan_min_samples=3)
         print(f"{fname} 处理前标签为2的点数: {num_label2_before}")
         print(f"{fname} 处理后标签为2的点数: {num_label2_after}")
-        write_pcd_ascii(output_path, header, filtered_points)
+        # 只保存标签2数量大于等于30的文件
+        if num_label2_after >= 30:
+            write_pcd_ascii(output_path, header, filtered_points)
+        else:
+            print(f"{fname} 标签2数量小于30，文件未保存.")

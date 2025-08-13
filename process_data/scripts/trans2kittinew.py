@@ -29,11 +29,11 @@ def convert_and_split_dataset(pcd_dir, output_root):
     # 所有 .pcd 文件排序后分组
     all_files = sorted([f for f in os.listdir(pcd_dir) if f.endswith('.pcd')])
     total = len(all_files)
-    assert total == 1192, f"期望 1198 个文件，实际找到 {total} 个"
+    assert total == 900, f"期望 1198 个文件，实际找到 {total} 个"
 
-    split_00 = all_files[:992]
-    split_01 = all_files[992:1092]
-    split_02 = all_files[1092:]
+    split_00 = all_files[:700]
+    split_01 = all_files[700:800]
+    split_02 = all_files[800:]
 
     splits = {
         "00": split_00,
@@ -86,8 +86,8 @@ def validate_sequences(output_root):
 
 if __name__ == "__main__":
     # 修改这里的路径为你裁剪后 .pcd 文件所在的目录
-    input_pcd_dir = "/home/may/data/process_data/data/afterDBSCAN_dataset"
-    output_root = "/home/may/data/process_data/data/Final_dataset/dataset"
+    input_pcd_dir = "/home/may/data/process_data/data/afterimproved_dataset"
+    output_root = "/home/may/data/process_data/data/Final_dataset2/dataset"
 
     convert_and_split_dataset(input_pcd_dir, output_root)
     validate_sequences(output_root)

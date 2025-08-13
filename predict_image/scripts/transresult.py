@@ -65,8 +65,8 @@ def convert_directory(bin_dir, npy_dir, pcd_dir):
                 print(f"转换失败: {npy_file}, 错误: {e}")
     
 if __name__ == "__main__":
-    bin_dir = "/home/may/data/process_data/data/Final_dataset/dataset/sequences/02/velodyne"  # .bin 文件目录
-    npy_dir = "/home/may/my_project/Pointcept/exp/aqc/semseg-pt-v3m1-4-train/result"  # .npy 文件目录
-    pcd_dir = "/home/may/data/predict_image/data/predictresult/exp4"  # 目标 .pcd 存储目录
+    bin_dir = "/home/may/data/process_data/data/Final_dataset2/dataset/sequences/02/velodyne"  # .bin 文件目录
+    npy_dir = "/home/may/my_project/Pointcept/exp/aqc/semseg-pt-v3m1-5-train/result"  # .npy 文件目录
+    pcd_dir = "/home/may/data/predict_image/data/predictresult/exp5"  # 目标 .pcd 存储目录
     
     convert_directory(bin_dir, npy_dir, pcd_dir)
